@@ -5,18 +5,8 @@ public class DijkstraAlgorithm {
 
     private static final String NODE_START = "start";
     private static final String NODE_FINISH = "finish";
-    private static final String NODE_A = "A";
-    private static final String NODE_B = "B";
     private static final String NODE_UNKNOWN = "-";
-
-    private static WeightedGraph graph = new WeightedGraph() {{
-        appendChild(NODE_START, NODE_A, 6);
-        appendChild(NODE_START, NODE_B, 2);
-        appendChild(NODE_B, NODE_A, 3);
-        appendChild(NODE_B, NODE_FINISH, 5);
-        appendChild(NODE_A, NODE_FINISH, 1);
-    }};
-
+    static WeightedGraph graph = FileHelper.resourceToType("test.json", WeightedGraph.class);
 
     private static Map<String, Double> costs = initCosts(graph);
     private static Map<String, String> parents = initParents(graph);
@@ -25,6 +15,8 @@ public class DijkstraAlgorithm {
 
 
     public static void main(String[] args) {
+
+        WeightedGraph graph2 = FileHelper.resourceToType("test.json", WeightedGraph.class);
 
         while (unprocessedNodesRemain()) {
             String currentNode = getClosestNode(costs);
