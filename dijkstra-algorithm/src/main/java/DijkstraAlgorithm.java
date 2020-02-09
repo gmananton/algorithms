@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class DijkstraAlgorithm {
 
@@ -19,31 +20,65 @@ public class DijkstraAlgorithm {
 
     private static Map<String, Double> costs = initCosts(graph);
     private static Map<String, String> parents = initParents(graph);
-    private static Set<String> nodeNames = new HashSet<>();
+    private static Set<String> nodeNames = costs.keySet();
     private static Set<String> processed = new HashSet<>();
 
 
     public static void main(String[] args) {
 
-        System.out.println(graph);
-        System.out.println(costs);
-        System.out.println(parents);
-
         while (unprocessedNodesRemain()) {
+            String currentNode = getClosestNode(costs);
+            Double currentCost = costs.get(currentNode);
+            WeightedNodes children = graph.get(currentNode);
 
+            for (String nodeName : children.keySet()) {
+                Double newSumCost = children.get(nodeName) + currentCost;
+                Double initialCost = costs.get(nodeName);
+                if (newSumCost < initialCost) {
+                    costs.put(nodeName, newSumCost);
+                    parents.put(nodeName, currentNode);
+                }
+            }
+
+            processed.add(currentNode);
         }
 
+        System.out.println("Minimal total cost: " + costs.get(NODE_FINISH));
+        Stack<String> order = new Stack<>();
+        String current = NODE_FINISH;
+
+        do {
+            order.push(current);
+            current = parents.get(current);
+        } while (current != null);
+
+
+        StringBuilder sb = new StringBuilder("Path: ");
+
+        int size = order.size();
+        for (int i = 0; i < size; i++) {
+            sb.append(order.pop());
+            if (i != size - 1) {
+                sb.append(" -> ");
+            }
+        }
+
+        System.out.println(sb.toString());
+
     }
+
 
     private static String getClosestNode(Map<String, Double> costs) {
-        costs.entrySet().stream().min(Comparator.comparing(Map.Entry::getValue)).get().getKey()
+        return costs.entrySet().stream()
+                .filter(entry -> !processed.contains(entry.getKey()))
+                .min(Comparator.comparing(Map.Entry::getValue))
+                .get()
+                .getKey();
     }
-
-
 
 
     private static boolean unprocessedNodesRemain() {
-        return !processed.containsAll(costs.keySet());
+        return !processed.containsAll(costs.keySet().stream().filter(k -> !NODE_START.equals(k) && !NODE_FINISH.equals(k)).collect(Collectors.toSet()));
     }
 
     private static Map<String, Double> initCosts(WeightedGraph graph) {
@@ -77,15 +112,15 @@ public class DijkstraAlgorithm {
 
 
     //Взвешенный граф
-    public static class WeightedGraph extends HashMap<String, WeightedNode> {
-        public WeightedNode appendChild(String parentName, String childName, Double childWeight) {
-            WeightedNode node = containsKey(parentName) ? get(parentName) : new WeightedNode();
-            node.put(childName, childWeight);
-            return put(parentName, node);
+    public static class WeightedGraph extends HashMap<String, WeightedNodes> {
+        public WeightedNodes appendChild(String parentName, String childName, Double childWeight) {
+            WeightedNodes nodes = containsKey(parentName) ? get(parentName) : new WeightedNodes();
+            nodes.put(childName, childWeight);
+            return put(parentName, nodes);
         }
     }
 
-    //Узел с весом
-    public static class WeightedNode extends HashMap<String, Double> {
+    //Узлы с весом
+    public static class WeightedNodes extends HashMap<String, Double> {
     }
 }
