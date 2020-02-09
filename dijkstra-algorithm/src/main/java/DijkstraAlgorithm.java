@@ -10,11 +10,11 @@ public class DijkstraAlgorithm {
     private static final String NODE_UNKNOWN = "-";
 
     private static WeightedGraph graph = new WeightedGraph() {{
-        appendChild(NODE_START, NODE_A, 6.0);
-        appendChild(NODE_START, NODE_B, 2.0);
-        appendChild(NODE_B, NODE_A, 3.0);
-        appendChild(NODE_B, NODE_FINISH, 5.0);
-        appendChild(NODE_A, NODE_FINISH, 1.0);
+        appendChild(NODE_START, NODE_A, 6);
+        appendChild(NODE_START, NODE_B, 2);
+        appendChild(NODE_B, NODE_A, 3);
+        appendChild(NODE_B, NODE_FINISH, 5);
+        appendChild(NODE_A, NODE_FINISH, 1);
     }};
 
 
@@ -113,6 +113,11 @@ public class DijkstraAlgorithm {
 
     //Взвешенный граф
     public static class WeightedGraph extends HashMap<String, WeightedNodes> {
+
+        public WeightedNodes appendChild(String parentName, String childName, Integer childWeight) {
+            return appendChild(parentName, childName, new Double(childWeight));
+        }
+
         public WeightedNodes appendChild(String parentName, String childName, Double childWeight) {
             WeightedNodes nodes = containsKey(parentName) ? get(parentName) : new WeightedNodes();
             nodes.put(childName, childWeight);
