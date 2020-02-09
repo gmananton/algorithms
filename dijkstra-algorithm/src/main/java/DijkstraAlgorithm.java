@@ -16,8 +16,6 @@ public class DijkstraAlgorithm {
 
     public static void main(String[] args) {
 
-        WeightedGraph graph2 = FileHelper.resourceToType("test.json", WeightedGraph.class);
-
         while (unprocessedNodesRemain()) {
             String currentNode = getClosestNode(costs);
             Double currentCost = costs.get(currentNode);
@@ -62,7 +60,10 @@ public class DijkstraAlgorithm {
 
     private static String getClosestNode(Map<String, Double> costs) {
         return costs.entrySet().stream()
-                .filter(entry -> !processed.contains(entry.getKey()))
+                .filter(entry -> {
+                    String key = entry.getKey();
+                    return !key.equals(NODE_FINISH) && !processed.contains(key);
+                })
                 .min(Comparator.comparing(Map.Entry::getValue))
                 .get()
                 .getKey();
