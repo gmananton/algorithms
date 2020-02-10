@@ -1,3 +1,4 @@
 rootProject.name = 'algorithms'
 
 include 'dijkstra-algorithm'
+include 'palindrome'
